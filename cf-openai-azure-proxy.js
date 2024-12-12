@@ -1,12 +1,12 @@
 // The name of your Azure OpenAI Resource.
-const resourceName=RESOURCE_NAME
+const resourceName = RESOURCE_NAME
 
 // The deployment name you chose when you deployed the model.
 const mapper = {
-    'gpt-4o': DEPLOY_NAME_GPT4O,
+  'gpt-4o': DEPLOY_NAME_GPT4O,
 };
 
-const apiVersion="2024-08-01-preview"
+const apiVersion = "2024-08-01-preview"
 
 addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
@@ -19,14 +19,14 @@ async function handleRequest(request) {
 
   const url = new URL(request.url);
   if (url.pathname.startsWith("//")) {
-    url.pathname = url.pathname.replace('/',"")
+    url.pathname = url.pathname.replace('/', "")
   }
   if (url.pathname === '/v1/chat/completions') {
-    var path="chat/completions"
+    var path = "chat/completions"
   } else if (url.pathname === '/v1/images/generations') {
-    var path="images/generations"
+    var path = "images/generations"
   } else if (url.pathname === '/v1/completions') {
-    var path="completions"
+    var path = "completions"
   } else if (url.pathname === '/v1/models') {
     return handleModels(request)
   } else {
@@ -38,12 +38,12 @@ async function handleRequest(request) {
     body = await request.json();
   }
 
-  const modelName = body?.model;  
-  const deployName = mapper[modelName] || '' 
+  const modelName = body?.model;
+  const deployName = mapper[modelName] || ''
 
   if (deployName === '') {
     return new Response('Missing model mapper', {
-        status: 403
+      status: 403
     });
   }
   const fetchAPI = `https://${resourceName}.openai.azure.com/openai/deployments/${deployName}/${path}?api-version=${apiVersion}`
@@ -68,9 +68,9 @@ async function handleRequest(request) {
   response = new Response(response.body, response);
   response.headers.set("Access-Control-Allow-Origin", "*");
 
-  if (body?.stream != true){
+  if (body?.stream != true) {
     return response
-  } 
+  }
 
   let { readable, writable } = new TransformStream()
   stream(response.body, writable);
@@ -90,7 +90,7 @@ async function stream(readable, writable) {
   // const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-// let decodedValue = decoder.decode(value);
+  // let decodedValue = decoder.decode(value);
   const newline = "\n";
   const delimiter = "\n\n"
   const encodedNewline = encoder.encode(newline);
@@ -123,7 +123,7 @@ async function stream(readable, writable) {
 async function handleModels(request) {
   const data = {
     "object": "list",
-    "data": []  
+    "data": []
   };
 
   for (let key in mapper) {
@@ -148,7 +148,7 @@ async function handleModels(request) {
       }],
       "root": key,
       "parent": null
-    });  
+    });
   }
 
   const json = JSON.stringify(data, null, 2);
@@ -158,12 +158,12 @@ async function handleModels(request) {
 }
 
 async function handleOPTIONS(request) {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Headers': '*'
-      }
-    })
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': '*',
+      'Access-Control-Allow-Headers': '*'
+    }
+  })
 }
 
