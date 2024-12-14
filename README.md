@@ -25,6 +25,8 @@
 ### 部署
 代理 OpenAI 的请求到 Azure OpenAI Serivce，代码部署步骤：
 
+#### 网页部署
+
 1. 注册并登录到 Cloudflare 账户
 2. 创建一个新的 Cloudflare Worker
 3. 将 [cf-openai-azure-proxy.js](./cf-openai-azure-proxy.js) 复制并粘贴到 Cloudflare Worker 编辑器中
@@ -32,6 +34,11 @@
 5. 保存并部署 Cloudflare Worker
 6. https://github.com/haibbo/cf-openai-azure-proxy/issues/3 **可选**绑定自定义域名: 在 Worker 详情页 -> Trigger -> Custom Domains 中为这个 Worker 添加一个自定义域名
 
+#### 命令行部署
+
+```shell
+npx wrangler deploy
+```
 
 ### 使用说明
 
