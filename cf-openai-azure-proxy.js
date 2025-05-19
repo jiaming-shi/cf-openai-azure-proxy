@@ -95,6 +95,7 @@ async function stream(readable, writable) {
   const encodedNewline = encoder.encode(newline);
 
   let buffer = "";
+  let isFirstChunk = true;
   while (true) {
     let { value, done } = await reader.read();
     if (done) break;
@@ -104,7 +105,14 @@ async function stream(readable, writable) {
 
     // Loop through all but the last line, which may be incomplete.
     for (let i = 0; i < lines.length - 1; i++) {
+      // Skip the first chunk if it contains empty choices array
+      if (isFirstChunk && lines[i].includes('"choices":[]')) {
+        isFirstChunk = false;
+        continue;
+      }
+
       await writer.write(encoder.encode(lines[i] + delimiter));
+      isFirstChunk = false;
       await sleep(20);
     }
 
